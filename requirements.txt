@@ -1,0 +1,6 @@
+streamlit
+openai
+python-dotenv
+azure-ai-formrecognizer
+transformers
+azure-search-documents
