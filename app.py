@@ -4,38 +4,57 @@ from services.gpt_summarizer import summarize_text
 from services.chunker import chunk_text
 from services.fp_classifier import classify_fp_coefficients
 from services.similar_project_search import search_similar_projects
+from services.utils import init_session_state
 
-st.title("AI 기반 RFP 분석 및 리스크 평가 AGENT")
+# 세션 초기화
+init_session_state()
 
+# UI 구성
+st.title("AI 기반 RFP 분석 AGENT")
 uploaded_file = st.file_uploader("📄 RFP 파일 업로드", type=["pdf", "docx"])
+tab1, tab2, tab3 = st.tabs(["📄 요약", "💬 질문하기", "💲SW개발비 산정"])
 
-if uploaded_file and "chunks" not in st.session_state:
-    with st.spinner("⏳ 문서 분석 중..."):
-        text = extract_text_from_file(uploaded_file)
-        chunks = chunk_text(text)
-        results = [summarize_text(chunk) for chunk in chunks]
+with tab1:
+    if uploaded_file is None:
+        st.markdown("📢 RFP 문서를 업로드하면 AI가 내용을 요약하고 유사 프로젝트를 추천해드립니다.")
 
-        st.session_state["text"] = text
-        st.session_state["chunks"] = chunks
-        st.session_state["summaries"] = results
+    if uploaded_file and "chunks" not in st.session_state:
+        with st.spinner("⏳ 문서 분석 중..."):
+            text = extract_text_from_file(uploaded_file)
+            chunks = chunk_text(text)
+            results = [summarize_text(chunk) for chunk in chunks]
 
-if "summaries" in st.session_state:
-    for i, res in enumerate(st.session_state["summaries"], 1):
-        st.subheader(f"📌 요약 {i}")
-        st.write(res)
+            st.session_state["text"] = text
+            st.session_state["chunks"] = chunks
+            st.session_state["summaries"] = results
 
-    with st.spinner("🔎 유사 프로젝트 검색 중..."):
-        query_summary = "\n".join(st.session_state["summaries"])
-        similar_projects = search_similar_projects(
-            query_text=query_summary,
-            embedding_model="text-embedding-3-small",  # 혹은 배포한 모델 이름
-        )
+    if "summaries" in st.session_state and st.session_state["summaries"] is not None:
+        for i, res in enumerate(st.session_state["summaries"], 1):
+            st.subheader(f"📌 요약 {i}")
+            st.write(res)
 
-        st.subheader("🧩 참고용 유사 프로젝트 추천")
-        for idx, project in enumerate(similar_projects, 1):
-            st.markdown(f"**{idx}. {project['title']}**  \n" f"- {project['chunk']}")
+        with st.spinner("🔎 유사 프로젝트 검색 중..."):
+            query_summary = "\n".join(st.session_state["summaries"])
+            similar_projects = search_similar_projects(
+                query_text=query_summary,
+                embedding_model="text-embedding-3-small",  # 혹은 배포한 모델 이름
+            )
 
-    if st.button("AI 기반 SW개발비 산정(FP방식)"):
+            st.subheader("🧩 참고용 유사 프로젝트 추천")
+            for idx, project in enumerate(similar_projects, 1):
+                st.markdown(f"**{idx}. {project['title']}**  \n" f"- {project['chunk']}")
+
+with tab2:
+    if uploaded_file is None:
+        st.markdown("📢 RFP 문서를 업로드하면 AI가 내용을 분석하여 질문에 답변해드립니다.")
+    
+    
+
+with tab3:
+    if uploaded_file is None:
+        st.markdown("📢 RFP 문서를 업로드하면 AI가 내용을 분석하여 보정계수를 판단하고, SW개발비를 산정해드립니다.")
+
+    if "chunks" in st.session_state and st.session_state["chunks"] is not None:
         with st.spinner("🤖 보정계수 판단 중..."):
             from services.fp_classifier import classify_fp_coefficients
             import json

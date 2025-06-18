@@ -9,4 +9,5 @@
 
 ## 실행 방법
 1. `pip install -r requirements.txt`
-3. `streamlit run app.py`
+2. `streamlit run app.py`
+3. `가상환경은 venv\Scripts\activate 후 run`
