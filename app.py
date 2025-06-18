@@ -14,19 +14,39 @@ st.title("AI 기반 RFP 분석 AGENT")
 uploaded_file = st.file_uploader("📄 RFP 파일 업로드", type=["pdf", "docx"])
 tab1, tab2, tab3 = st.tabs(["📄 요약", "💬 질문하기", "💲SW개발비 산정"])
 
+if uploaded_file and uploaded_file.name != st.session_state["uploaded_filename"]:
+    # 세션 초기화
+    # st.session_state["uploaded_filename"] = uploaded_file.name
+    # st.session_state["text"] = None
+    # st.session_state["chunks"] = None
+    # st.session_state["summaries"] = None
+    # st.session_state["best_summary"] = None
+    # st.session_state["messages"] = []
+
+    # 필요한 키 전부 초기화하거나 삭제하고 싶으면
+    for key in list(st.session_state.keys()):
+        del st.session_state[key]
+
+    st.session_state["uploaded_filename"] = uploaded_file.name    
+
 with tab1:
     if uploaded_file is None:
         st.markdown("📢 RFP 문서를 업로드하면 AI가 내용을 요약하고 유사 프로젝트를 추천해드립니다.")
 
-    if uploaded_file and "chunks" not in st.session_state:
+    if uploaded_file and st.session_state["chunks"] is None:
         with st.spinner("⏳ 문서 분석 중..."):
             text = extract_text_from_file(uploaded_file)
             chunks = chunk_text(text)
             results = [summarize_text(chunk) for chunk in chunks]
 
+            best_summary = select_representative_summary(
+                results,
+                embedding_model="dev-text-embedding-3-small"
+            )
+
             st.session_state["text"] = text
             st.session_state["chunks"] = chunks
-            st.session_state["summaries"] = results
+            st.session_state["summaries"] = best_summary
 
     if "summaries" in st.session_state and st.session_state["summaries"] is not None:
         for i, res in enumerate(st.session_state["summaries"], 1):
@@ -37,7 +57,7 @@ with tab1:
             query_summary = "\n".join(st.session_state["summaries"])
             similar_projects = search_similar_projects(
                 query_text=query_summary,
-                embedding_model="text-embedding-3-small",  # 혹은 배포한 모델 이름
+                embedding_model="dev-text-embedding-3-small",
             )
 
             st.subheader("🧩 참고용 유사 프로젝트 추천")

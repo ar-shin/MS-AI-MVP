@@ -34,3 +34,10 @@ def summarize_text(text):
         # temperature=0.4, dev-o4-mini 모델은 temperature 파라미터를 지원하지 않음
     )
     return response.choices[0].message.content
+
+def select_representative_summary(summaries, embedding_model):
+    vectors = [get_embedding(s, model) for s in summaries]
+    center = np.mean(vectors, axis=0)
+    distances = [np.linalg.norm(np.array(v) - center) for v in vectors]
+    best_idx = np.argmin(distances)
+    return summaries[best_idx]
