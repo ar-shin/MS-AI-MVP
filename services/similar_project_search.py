@@ -12,15 +12,9 @@ search_client = SearchClient(
     index_name=os.getenv("AZURE_SEARCH_INDEX_NAME"),
     credential=AzureKeyCredential(os.getenv("AZURE_SEARCH_KEY")),
 )
-# openai_client = AzureOpenAI(
-#     api_key=os.getenv("OPENAI_API_KEY"),
-#     api_version=os.getenv("OPENAI_API_VERSION"),
-#     azure_endpoint=os.getenv("AZURE_ENDPOINT"),
-# )
-
 
 def search_similar_projects(query_text, embedding_model, k=5):
-    embedding_vector = [get_embedding(s, model) for s in summaries]
+    embedding_vector = get_embedding(query_text, embedding_model)
 
     search_results = search_client.search(
         search_text="",

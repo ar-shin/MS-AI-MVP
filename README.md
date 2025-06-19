@@ -1,4 +1,4 @@
-# MVP - AI 기반 RFP 분석 및 리스크 평가 서비스
+# MVP - AI 기반 RFP 분석 Agent
 
 ## 필요 사항
 - Azure Document Intelligence(Recognizer)

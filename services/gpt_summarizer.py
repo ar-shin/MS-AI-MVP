@@ -1,7 +1,9 @@
 import os
+import numpy as np
 from openai import AzureOpenAI
 from dotenv import load_dotenv
-from services.prompt_loader import load_prompt_template
+from services.utils import load_prompt_template
+from services.utils import get_embedding
 
 load_dotenv()
 
@@ -36,7 +38,7 @@ def summarize_text(text):
     return response.choices[0].message.content
 
 def select_representative_summary(summaries, embedding_model):
-    vectors = [get_embedding(s, model) for s in summaries]
+    vectors = [get_embedding(s, embedding_model) for s in summaries]
     center = np.mean(vectors, axis=0)
     distances = [np.linalg.norm(np.array(v) - center) for v in vectors]
     best_idx = np.argmin(distances)
