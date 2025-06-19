@@ -144,15 +144,16 @@ elif tab_option == "💬 질문하기":
     if user_question:
         st.session_state.messages.append({"role": "user", "content": user_question})
 
-        with st.chat_message("assistant"):
-            with st.spinner("🤖 답변 생성 중..."):
-                context = "\n".join(st.session_state["chunks"])
+        st.chat_message("user").write(user_question)
 
-                answer = answer_question(context, user_question)
+        with st.spinner("🤖 답변 생성 중..."):
+            context = "\n".join(st.session_state["chunks"])
 
-                st.markdown(answer)
+            answer = answer_question(context, user_question)
 
-                st.session_state.messages.append({"role": "assistant", "content": answer})
+            st.chat_message("assistant").write(answer)
+
+            st.session_state.messages.append({"role": "assistant", "content": answer})
     
 
 elif tab_option == "💲SW개발비 산정":
