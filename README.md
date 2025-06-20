@@ -11,3 +11,6 @@
 1. `pip install -r requirements.txt`
 2. `streamlit run app.py`
 3. `가상환경은 venv\Scripts\activate 후 run`
+
+## 배포된 웹사이트
+https://arshin-web-001.azurewebsites.net/
