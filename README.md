@@ -14,3 +14,6 @@
 
 ## 배포된 웹사이트
 https://arshin-web-001.azurewebsites.net/
+
+## 발표자료
+https://docs.google.com/presentation/d/1mDjbuNkngPHLQHZlwxj81aDhuJ4jjuEv/edit?slide=id.p1#slide=id.p1
